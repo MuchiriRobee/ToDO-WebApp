@@ -27,8 +27,9 @@
 
     /* Top banner */
     .banner {
-      height: 30vh;
-      background: url('images/bg-desktop-light.jpg') center/cover no-repeat;
+      height: 33vh;
+      background:
+                  url('images/bg-desktop-light.jpg') center/cover no-repeat;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -114,6 +115,10 @@
       color: var(--completed-text);
     }
 
+    li.dragging {
+      opacity: 0.5;
+    }
+
     .task-left {
       display: flex;
       align-items: center;
@@ -165,6 +170,8 @@
       justify-content: space-between;
       align-items: center;
       font-size: 0.9rem;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .clear-completed {

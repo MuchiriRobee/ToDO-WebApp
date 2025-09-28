@@ -1,4 +1,4 @@
- const taskList = document.getElementById("task-list");
+    const taskList = document.getElementById("task-list");
     const taskInput = document.getElementById("task-input");
     const addTaskForm = document.querySelector(".add-task");
     const filterButtons = document.querySelectorAll(".filters button");
@@ -7,19 +7,18 @@
     const clearCompletedBtn = document.querySelector(".clear-completed");
     let currentFilter = "all";
 
-    // Update active tasks count
     function updateCount() {
       const activeTasks = taskList.querySelectorAll("li:not(.completed)").length;
       taskCount.textContent = `${activeTasks} task${activeTasks !== 1 ? "s" : ""} left`;
     }
 
-    // Add task
     addTaskForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const value = taskInput.value.trim();
       if (!value) return;
 
       const li = document.createElement("li");
+      li.setAttribute("draggable", "true");
       li.innerHTML = `
         <div class="task-left">
           <input type="checkbox" class="check">
@@ -35,7 +34,6 @@
       updateCount();
     });
 
-    // Task actions
     taskList.addEventListener("click", (e) => {
       const li = e.target.closest("li");
       if (!li) return;
@@ -74,7 +72,6 @@
       }
     });
 
-    // Filters
     filterButtons.forEach(btn => {
       btn.addEventListener("click", () => {
         currentFilter = btn.dataset.filter;
@@ -97,16 +94,47 @@
       });
     }
 
-    // Clear completed
     clearCompletedBtn.addEventListener("click", () => {
       document.querySelectorAll("li.completed").forEach(task => task.remove());
       updateCount();
     });
 
-    // Theme toggle
     themeBtn.addEventListener("click", () => {
       document.body.classList.toggle("dark");
       themeBtn.innerHTML = document.body.classList.contains("dark")
         ? '<i class="fa-solid fa-sun"></i>'
         : '<i class="fa-solid fa-moon"></i>';
     });
+
+    // Drag and drop
+    taskList.addEventListener("dragstart", (e) => {
+      e.target.classList.add("dragging");
+    });
+    taskList.addEventListener("dragend", (e) => {
+      e.target.classList.remove("dragging");
+    });
+    taskList.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      const dragging = taskList.querySelector(".dragging");
+      const afterElement = getDragAfterElement(taskList, e.clientY);
+      if (afterElement == null) {
+        taskList.appendChild(dragging);
+      } else {
+        taskList.insertBefore(dragging, afterElement);
+      }
+    });
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll("li:not(.dragging)")];
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    updateCount();
